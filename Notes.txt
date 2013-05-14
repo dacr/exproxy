@@ -1,0 +1,80 @@
+Quelques commandes utiles :
+host=www.voila.fr;/bin/echo -e "GET / HTTP/1.1\nHost: $host\nConnection: close\n\n" | nc $host 80 | more
+
+
+
+
+
+MINISPEC POUR MiddleMan 1.0:
+- Récupérer et persister les signatures de :
+  + Serveurs
+  + Response Headers
+  + Request Headers
+  + Cookies
+  + Hosts
+  + url parameters
+  + hidden form parameters
+
+- Mise en forme de données
+  + Maillage
+
+
+
+TACHES :
+- TODO : Quelques soucis de performance, vérifier si des Threads
+         ne tournent pas en rond, notament voir l'activités ssl
+         (boucle infinie?).
+         Le fait d'être à la fois serveur SSL et clients SSL grève
+         probablement ces performances
+- TODO : Une exception peut remonter au pool de Thread est arrêter
+         ces traitements => A reproduire.
+- TODO : Le header data doit être exprimé en temps GMT !!
+         (pour les messages forgés par le eproxy)
+- TODO : Placer le contenu des messages HTTP sur le disque et non pas en mémoire
+
+- TODO : Gérer correctement les erreurs et les remonter vers le navigateur
+         tout en fermant la connection : "Connection: close"
+
+- DONE : Initialiser correctement les adresses/ports source et destination
+- DONE : Conserver et réutiliser les connexions distantes
+         (Gestion du header Connection : keep-alive, close, ...)
+
+
+
+
+
+Notes sur le protocol HTTP et HTTP-PROXY
+
+- Cookie: Request Header pour renvoyer un cookie vers le serveur
+- Set-Cookie : Response Header pour placer un cookie sur le client
+- Range: bytes=22699- : Permet à un navigateur de reprendre le
+  téléchargement d'une page par rapport à la où il en était.
+  => Fonctionnement transparent pour le proxy
+- Une requête et une réponse peuvent toutes les deux contenir des
+  données (content-type et content-length) notamment le POST bien
+  évidemment.
+  Dans le cas d'une request : Si le header Content-Length ou Transfer-Encoding
+                        est spécifié alors il y a un content
+  Dans le cas d'une response : C'est plus compliqué et dépend
+              de la méthode utilisée, du status de la connection, ...
+- ATTENTION : \r Obligatoire dans l'envois des requêtes sinon
+  des sites IIS risquent de ne pas répondre ou de répondre une erreur
+  => A Priori obligatoire pour la norme
+- ATTENTION : Lorsque le server retourne le header Connection: close
+  il ne donne pas de content-length !!
+- ATTENTION : Dans le cas de la method CONNECT, ne pas oublier de 
+  retourner au client une réponse sur l'acceptation ou non du CONNECT
+  pour que notamment ce dernier continue et envois une nouvelle
+  requête via le tunnel établit par la méthode CONNECT
+- ATTENTION : Dans le cas d'un response body transmis en Chunked on
+  peut retrouver après le dernier chunk des headers supplémentaires
+
+
+
+
+Notes sur Java (version 1.5 utilisée)
+
+- Il n'est pas possible de faire du SSL implicitement sur 
+  les opérations read/write d'un "channel" => Il faut effectuer
+  une gestion manuelle SSL via le SSLEngine
+
