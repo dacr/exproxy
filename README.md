@@ -8,5 +8,7 @@ If your main network interface is br0 for example, run like this :
 sbt "run br0"
 
 default is eth0
-
+sbt run
+is the same as :
+sbt "run eth0"
 
