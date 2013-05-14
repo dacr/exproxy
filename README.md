@@ -12,3 +12,9 @@ sbt run
 is the same as :
 sbt "run eth0"
 
+
+to generate an "executable" : sbt assembly
+then to run it : 
+java -jar target/scala-2.10/exproxy.jar br0
+
+
